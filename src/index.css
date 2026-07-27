@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+
+@import 'tailwindcss';
+
+@theme {
+  --color-candy-pink: #f8a4c8;
+  --color-bubblegum: #ff6eb4;
+  --color-baby-pink: #ffd6e8;
+  --color-sakura: #ffc0d9;
+  --color-hot-pink: #ff3d8a;
+  --color-cream: #fff9f5;
+  --color-peach: #ffecd2;
+  --color-lavender: #e8d5f5;
+  --color-rose: #ffd4e0;
+  --color-mint: #d4f5e9;
+  --color-sky: #d4eeff;
+
+  --font-display: 'Fredoka One', cursive;
+  --font-body: 'Nunito', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  --radius-pill: 9999px;
+  --radius-card: 24px;
+  --radius-soft: 16px;
+}
+
+:root {
+  --bg-base: #fff0f7;
+  --bg-surface: rgba(255, 255, 255, 0.72);
+  --glow-pink: 0 0 32px rgba(255, 110, 180, 0.35);
+  --glow-soft: 0 8px 32px rgba(248, 164, 200, 0.4);
+  --shadow-float: 0 16px 40px rgba(255, 61, 138, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-base);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Scrollbar hide */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 110, 180, 0.3); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 110, 180, 0.6); }
+
+/* Global animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-12px) rotate(2deg); }
+  66% { transform: translateY(-6px) rotate(-1deg); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-18px); }
+}
+
+@keyframes drift {
+  0% { transform: translateY(100vh) translateX(0px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-120px) translateX(40px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1) rotate(180deg); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3) translateY(40px); opacity: 0; }
+  60% { transform: scale(1.12) translateY(-8px); opacity: 1; }
+  80% { transform: scale(0.95) translateY(2px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 110, 180, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(255, 110, 180, 0.7), 0 0 80px rgba(255, 110, 180, 0.3); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes number-flip {
+  0% { transform: rotateX(0deg); }
+  50% { transform: rotateX(-90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+@keyframes balloon-rise {
+  0% { transform: translateY(110vh) rotate(-5deg); opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.9; }
+  100% { transform: translateY(-20vh) rotate(5deg); opacity: 0; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.2); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.1); }
+}
+
+@keyframes star-spin {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.3); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes walk-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Gradient animated background */
+.gradient-bg {
+  background: linear-gradient(135deg, #fff0f7 0%, #ffe4f0 25%, #ffd6e8 50%, #ffe8f5 75%, #fff5fb 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 182, 213, 0.5);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(255, 110, 180, 0.15), 0 2px 8px rgba(255, 182, 213, 0.2);
+}
+
+/* Shimmer button */
+.shimmer-btn {
+  background: linear-gradient(90deg, #ff6eb4 0%, #ff9dd1 25%, #ffb8e0 50%, #ff9dd1 75%, #ff6eb4 100%);
+  background-size: 200% auto;
+  animation: shimmer 2.5s linear infinite;
+}
+
+/* Pixel font for 8-bit elements */
+.pixel-font {
+  font-family: 'DM Mono', monospace;
+  image-rendering: pixelated;
+  letter-spacing: 0.05em;
+}
