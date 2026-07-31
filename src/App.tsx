@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_URL } from "./config";
 import Background from "./components/Background";
 import Countdown from "./components/Countdown";
 import HelloKitty from "./components/HelloKitty";
@@ -19,28 +20,48 @@ const TABS = [
 export default function App() {
   const [activeTab, setActiveTab] = useState("countdown");
   const [mounted, setMounted] = useState(false);
-  const [scores, setScores] = useState<{ name: string; score: number; date: string }[]>([
-    { name: "Sakura ✿", score: 2480, date: "Jul 12" },
-    { name: "Mochi 🍡", score: 1920, date: "Jul 13" },
-    { name: "Kira ⭐", score: 1650, date: "Jul 14" },
-    { name: "Yuki ❄️", score: 1200, date: "Jul 10" },
-    { name: "Hana 🌸", score: 980, date: "Jul 9" },
-  ]);
+  const [scores, setScores] = useState<{ name: string; score: number; date: string }[]>([]);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  const handleNewScore = (score: number) => {
+  useEffect(() => {
+    fetch(`${API_URL}/api/highscores`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((row: any) => ({
+          name: row.player_name,
+          score: row.score,
+          date: new Date(row.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        }));
+        setScores(formatted);
+      })
+      .catch((err) => console.error("Failed to fetch high scores:", err));
+  }, []);
+
+  const handleNewScore = async (score: number) => {
     const names = ["Player 🎀", "Star ⭐", "Bunny 🐰", "Cupcake 🧁", "Bow 🎀"];
     const name = names[Math.floor(Math.random() * names.length)];
-    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
-    setScores((prev) =>
-      [...prev, { name, score, date: today }]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10)
-    );
+
+    try {
+      await fetch(`${API_URL}/api/highscores`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerName: name, score }),
+      });
+      const res = await fetch(`${API_URL}/api/highscores`);
+      const data = await res.json();
+      const formatted = data.map((row: any) => ({
+        name: row.player_name,
+        score: row.score,
+        date: new Date(row.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      }));
+      setScores(formatted);
+    } catch (err) {
+      console.error("Failed to submit score:", err);
+    }
   };
 
   return (

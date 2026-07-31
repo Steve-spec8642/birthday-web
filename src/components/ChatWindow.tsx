@@ -1,36 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_URL } from "../config";
 
 interface Message {
   id: number;
   role: "user" | "assistant";
   text: string;
   ts: Date;
-}
-
-const RESPONSES: Record<string, string> = {
-  default: "I'm so happy you're here for this birthday celebration! 🎂✨ Every birthday is a chance to make magical memories. What would you like to know?",
-  wish: "Close your eyes, make a big wish, and blow out all the candles in one breath! 🕯️ Legend says if you don't tell anyone your wish, it'll come true. What's your birthday wish? 🌟",
-  cake: "The perfect birthday cake has to be rich, moist, and absolutely covered in pink frosting! 🎂🩷 Don't forget the sprinkles — they're basically mandatory. What's your favorite flavor?",
-  gift: "The best gifts come from the heart! 🎁💕 Whether it's something small and thoughtful or a grand surprise, what matters most is that it shows you care. What are you hoping for?",
-  balloon: "Balloons make EVERYTHING better! 🎈 Pink, purple, gold, confetti-filled — they float and sparkle and bring so much joy. Did you know the first rubber balloon was invented in 1824?",
-  song: "Happy Birthday to yoooou! 🎵🎂 The birthday song is one of the most recognized songs in the world. Let everyone hear it, don't be shy — it's YOUR special day!",
-  hello: "Helloooo! 👋🌸 Welcome to your magical birthday experience! I'm your Birthday Assistant, here to make your special day even more sparkly and wonderful. How can I help? ✨",
-  age: "Age is just a number — what matters is how young your heart feels! 🩷 Every year you gain more wisdom, more joy, and more reasons to celebrate. Happy birthday!",
-  party: "Party time!! 🎉🎊 Confetti, music, dancing, and cake — that's the recipe for the perfect birthday bash! Don't forget the birthday crown. You deserve to wear it all day! 👑",
-};
-
-function getBotResponse(text: string): string {
-  const lower = text.toLowerCase();
-  if (lower.includes("wish") || lower.includes("candle")) return RESPONSES.wish;
-  if (lower.includes("cake") || lower.includes("frosting")) return RESPONSES.cake;
-  if (lower.includes("gift") || lower.includes("present")) return RESPONSES.gift;
-  if (lower.includes("balloon")) return RESPONSES.balloon;
-  if (lower.includes("song") || lower.includes("sing")) return RESPONSES.song;
-  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) return RESPONSES.hello;
-  if (lower.includes("age") || lower.includes("old") || lower.includes("year")) return RESPONSES.age;
-  if (lower.includes("party") || lower.includes("celebrate")) return RESPONSES.party;
-  return RESPONSES.default;
 }
 
 const SUGGESTIONS = [
@@ -68,11 +44,20 @@ export default function ChatWindow() {
     setMessages((m) => [...m, userMsg]);
 
     setTyping(true);
-    await new Promise((r) => setTimeout(r, 800 + Math.random() * 600));
-    setTyping(false);
-
-    const reply = getBotResponse(msg);
-    setMessages((m) => [...m, { id: msgId++, role: "assistant", text: reply, ts: new Date() }]);
+    try {
+      const res = await fetch(`${API_URL}/api/ask`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
+      });
+      const data = await res.json();
+      setTyping(false);
+      const reply = data.reply || "Sorry, I'm having trouble thinking right now! 🌸";
+      setMessages((m) => [...m, { id: msgId++, role: "assistant", text: reply, ts: new Date() }]);
+    } catch (err) {
+      setTyping(false);
+      setMessages((m) => [...m, { id: msgId++, role: "assistant", text: "Oops, I couldn't connect! Try again? 💕", ts: new Date() }]);
+    }
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
