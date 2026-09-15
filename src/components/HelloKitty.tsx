@@ -1,295 +1,122 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Hello Kitty drawn with CSS/divs in 8-bit pixel style
-// Each frame is a grid of colored pixels
+import photo1 from "../assets/kitty/photo1.png";
+import photo2 from "../assets/kitty/photo2.png";
+import photo3 from "../assets/kitty/photo3.png";
+import photo4 from "../assets/kitty/photo4.png";
+import photo5 from "../assets/kitty/photo5.png";
+import photo6 from "../assets/kitty/photo6.png";
+import photo7 from "../assets/kitty/photo7.png";
+import photo8 from "../assets/kitty/photo8.png";
+import photo9 from "../assets/kitty/photo9.png";
+import photo10 from "../assets/kitty/photo10.png";
+import photo11 from "../assets/kitty/photo11.png";
+import photo12 from "../assets/kitty/photo12.png";
+import photo13 from "../assets/kitty/photo13.png";
+import photo14 from "../assets/kitty/photo14.png";
+import photo15 from "../assets/kitty/photo15.png";
 
-const PINK = "#ff9dd1";
-const WHITE = "#ffffff";
-const BLACK = "#1a1a2e";
-const YELLOW = "#ffd700";
-const RED = "#ff3d8a";
-const NONE = "transparent";
-
-// Pixel grid: 16x16
-// 0=none, 1=white, 2=pink, 3=black, 4=yellow, 5=red
-const IDLE_FRAME: number[][] = [
-  [0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0],
-  [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
-  [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
-  [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-  [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-  [0,1,1,3,3,1,1,1,1,1,1,3,3,1,1,0],
-  [0,1,1,3,3,1,1,1,1,1,1,3,3,1,1,0],
-  [4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4],
-  [0,1,1,1,1,1,3,1,1,3,1,1,1,1,1,0],
-  [0,1,1,1,1,1,1,3,3,1,1,1,1,1,1,0],
-  [0,0,1,1,2,2,1,1,1,1,2,2,1,1,0,0],
-  [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
-  [0,0,0,0,2,2,2,1,1,2,2,2,0,0,0,0],
-  [0,0,0,0,0,2,1,1,1,1,2,0,0,0,0,0],
-  [0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0],
-  [0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0],
+const PHOTOS = [
+  { src: photo1, caption: "Bright star, I wish I could stay steady like you are—" },
+  { src: photo2, caption: "Not alone, hanging high in the night," },
+  { src: photo3, caption: "Watching everything below without ever closing your eyes," },
+  { src: photo4, caption: "Quiet and patient, never needing to sleep." },
+  { src: photo5, caption: "Watching the ocean move along the shore," },
+  { src: photo6, caption: "Washing over the earth again and again," },
+  { src: photo7, caption: "Or looking down at fresh snow covering" },
+  { src: photo8, caption: "The mountains and open fields." },
+  { src: photo9, caption: "No—I'd rather stay right here, unchanged," },
+  { src: photo10, caption: "Resting my head against my love's chest," },
+  { src: photo11, caption: "Feeling her breathe slowly in and out," },
+  { src: photo12, caption: "Awake forever in this beautiful kind of peace," },
+  { src: photo13, caption: "Always listening to her soft, gentle breathing," },
+  { src: photo14, caption: "And live like this forever—or lose myself in it completely." },
+  { src: photo15, caption: "I love you so much baby 🎀" },
 ];
 
-// Wave frame - bow moved, one arm up
-const WAVE_FRAME: number[][] = [
-  [0,0,0,0,0,5,5,1,1,0,0,0,0,0,0,0],
-  [0,0,0,0,1,5,5,1,1,1,1,1,0,0,0,0],
-  [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
-  [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-  [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-  [0,1,1,3,3,1,1,1,1,1,1,3,3,1,1,0],
-  [0,1,1,3,3,1,1,1,1,1,1,3,3,1,1,0],
-  [4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4],
-  [0,1,1,1,1,1,3,1,1,3,1,1,1,1,1,0],
-  [0,1,1,1,1,1,1,2,2,1,1,1,1,1,1,0],
-  [0,0,1,1,2,2,1,1,1,1,2,2,1,1,0,0],
-  [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
-  [0,0,0,0,2,2,2,1,1,2,2,2,0,0,0,0],
-  [0,0,0,0,0,2,1,1,1,1,2,0,0,0,0,0],
-  [0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0],
-  [0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0],
-];
-
-const COLOR_MAP: Record<number, string> = {
-  0: NONE,
-  1: WHITE,
-  2: PINK,
-  3: BLACK,
-  4: YELLOW,
-  5: RED,
-};
-
-const ANIMATIONS = ["idle", "wave", "jump", "dance"] as const;
-type AnimState = typeof ANIMATIONS[number];
-
-const ANIM_LABELS: Record<AnimState, string> = {
-  idle: "😊 Idle",
-  wave: "👋 Waving",
-  jump: "🌟 Jumping",
-  dance: "💃 Dancing",
-};
-
-interface KittyPixelProps {
-  frame: number[][];
-  scale?: number;
-}
-function KittyPixel({ frame, scale = 3 }: KittyPixelProps) {
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(16, ${scale * 4}px)`,
-        gridTemplateRows: `repeat(16, ${scale * 4}px)`,
-        imageRendering: "pixelated",
-        gap: 0,
-      }}
-    >
-      {frame.flatMap((row, ri) =>
-        row.map((cell, ci) => (
-          <div
-            key={`${ri}-${ci}`}
-            style={{
-              width: scale * 4,
-              height: scale * 4,
-              background: COLOR_MAP[cell] ?? NONE,
-            }}
-          />
-        ))
-      )}
-    </div>
-  );
-}
-
-function PixelSparkle({ x, y }: { x: number; y: number }) {
-  return (
-    <motion.div
-      className="absolute pointer-events-none text-xl"
-      style={{ left: x, top: y }}
-      initial={{ scale: 0, opacity: 1, rotate: 0 }}
-      animate={{ scale: [0, 1.5, 0], opacity: [1, 1, 0], rotate: [0, 180, 360] }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-    >
-      ✨
-    </motion.div>
-  );
-}
+const HOLD_MS = 4000; // how long each photo stays on screen
 
 export default function HelloKitty() {
-  const [anim, setAnim] = useState<AnimState>("idle");
-  const [frameIdx, setFrameIdx] = useState(0);
-  const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number }[]>([]);
-  const [sparkleId, setSparkleId] = useState(0);
-  const [blinking, setBlinking] = useState(false);
+  const [index, setIndex] = useState(0);
 
-  // Auto-animate frame cycling
-  useEffect(() => {
-    const speed = anim === "dance" ? 200 : anim === "jump" ? 150 : 600;
-    const id = setInterval(() => setFrameIdx((f) => (f + 1) % 2), speed);
-    return () => clearInterval(id);
-  }, [anim]);
-
-  // Blink every few seconds
   useEffect(() => {
     const id = setInterval(() => {
-      setBlinking(true);
-      setTimeout(() => setBlinking(false), 200);
-    }, 3500);
+      setIndex((i) => (i + 1) % PHOTOS.length);
+    }, HOLD_MS);
     return () => clearInterval(id);
   }, []);
 
-  const addSparkle = () => {
-    const x = 40 + Math.random() * 160;
-    const y = 20 + Math.random() * 200;
-    const id = sparkleId;
-    setSparkleId((s) => s + 1);
-    setSparkles((s) => [...s, { id, x, y }]);
-    setTimeout(() => setSparkles((s) => s.filter((sp) => sp.id !== id)), 900);
-  };
-
-  const currentFrame = frameIdx === 0 ? IDLE_FRAME : WAVE_FRAME;
-
-  const kittyTransform: Record<AnimState, object> = {
-    idle: { y: [0, -4, 0] },
-    wave: { y: [0, -6, 0], rotate: [0, 3, -3, 0] },
-    jump: { y: [0, -20, 0, -14, 0] },
-    dance: { x: [0, 6, 0, -6, 0], rotate: [0, 5, 0, -5, 0] },
-  };
+  const current = PHOTOS[index];
 
   return (
-    <div className="max-w-3xl mx-auto pt-4 pb-8">
+    <div className="max-w-xl mx-auto pt-4 pb-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-8"
+        transition={{ duration: 0.6 }}
+        className="text-center mb-6"
       >
         <h2
           className="text-3xl md:text-4xl font-black mb-2"
           style={{
             fontFamily: "'Fredoka One', cursive",
-            background: "linear-gradient(135deg, #ff3d8a, #c084fc)",
+            background: "linear-gradient(135deg, #ff3d8a, #ff6eb4, #c084fc)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
           }}
         >
-          Hello Kitty 8-Bit ✨
+          A Little Trip Down Memory Lane 🐱
         </h2>
-        <p className="text-pink-400 font-semibold">
-          A tiny retro world just for you 🎮🌸
-        </p>
       </motion.div>
 
-      {/* Game area */}
-      <div className="glass-card p-6 md:p-10 mb-6">
-        <div
-          className="relative rounded-2xl overflow-hidden flex items-center justify-center mx-auto"
-          style={{
-            width: "100%",
-            maxWidth: 340,
-            height: 280,
-            background: "linear-gradient(135deg, #ffd6e8 0%, #e8d5f5 50%, #d4eeff 100%)",
-            border: "3px solid rgba(255,110,180,0.4)",
-            boxShadow: "inset 0 2px 8px rgba(255,110,180,0.2)",
-          }}
-        >
-          {/* Pixel background decorations */}
-          {["🌸", "⭐", "💕", "🌈", "✨"].map((e, i) => (
-            <div
-              key={i}
-              className="absolute text-lg opacity-30"
-              style={{
-                left: `${10 + i * 18}%`,
-                top: `${15 + (i % 2) * 50}%`,
-                animation: `float ${3 + i}s ease-in-out infinite ${i * 0.5}s`,
-              }}
-            >
-              {e}
-            </div>
-          ))}
+      <div
+        className="glass-card relative overflow-hidden"
+        style={{ aspectRatio: "1 / 1", boxShadow: "var(--glow-soft)" }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={index}
+            src={current.src}
+            alt={current.caption}
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeInOut" },
+              scale: { duration: HOLD_MS / 1000 + 1.2, ease: "easeOut" },
+            }}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </AnimatePresence>
+      </div>
 
-          {/* Pixel floor */}
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={index}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mt-5 text-pink-500 font-semibold text-base md:text-lg"
+          style={{ fontFamily: "'Nunito', sans-serif" }}
+        >
+          {current.caption}
+        </motion.p>
+      </AnimatePresence>
+
+      <div className="flex justify-center gap-1.5 mt-5">
+        {PHOTOS.map((_, i) => (
           <div
-            className="absolute bottom-0 left-0 right-0 h-8"
+            key={i}
+            className="rounded-full transition-all duration-300"
             style={{
-              background: "repeating-linear-gradient(90deg, #ffb8e0 0px, #ffb8e0 16px, #ff9dd1 16px, #ff9dd1 32px)",
-              opacity: 0.5,
+              width: i === index ? 18 : 6,
+              height: 6,
+              background: i === index ? "#ff6eb4" : "rgba(255,110,180,0.3)",
             }}
           />
-
-          {/* Kitty */}
-          <motion.div
-            animate={kittyTransform[anim]}
-            transition={{ duration: anim === "jump" ? 0.6 : 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="relative cursor-pointer"
-            onClick={addSparkle}
-            style={{ filter: blinking ? "brightness(1.2)" : "none" }}
-          >
-            <div style={{ filter: "drop-shadow(0 4px 16px rgba(255,61,138,0.4))" }}>
-              <KittyPixel frame={currentFrame} scale={4} />
-            </div>
-          </motion.div>
-
-          {/* Sparkles */}
-          {sparkles.map((sp) => (
-            <PixelSparkle key={sp.id} x={sp.x} y={sp.y} />
-          ))}
-
-          {/* Click hint */}
-          <div
-            className="absolute bottom-2 right-3 text-xs font-bold text-pink-400 opacity-60 pixel-font"
-          >
-            tap to sparkle ✨
-          </div>
-        </div>
-      </div>
-
-      {/* Animation selector */}
-      <div className="glass-card p-5">
-        <h3
-          className="text-center text-lg font-black text-pink-600 mb-4"
-          style={{ fontFamily: "'Fredoka One', cursive" }}
-        >
-          Choose Animation 🎬
-        </h3>
-        <div className="flex flex-wrap justify-center gap-3">
-          {ANIMATIONS.map((a) => (
-            <motion.button
-              key={a}
-              whileHover={{ scale: 1.06, y: -2 }}
-              whileTap={{ scale: 0.92 }}
-              onClick={() => setAnim(a)}
-              className="px-5 py-2.5 rounded-full font-bold text-sm"
-              style={{
-                fontFamily: "'Nunito', sans-serif",
-                background:
-                  anim === a
-                    ? "linear-gradient(135deg, #ff3d8a, #c084fc)"
-                    : "rgba(255,255,255,0.8)",
-                color: anim === a ? "white" : "#e0569a",
-                border: "2px solid rgba(255,110,180,0.3)",
-                boxShadow: anim === a ? "0 4px 16px rgba(255,61,138,0.4)" : "none",
-              }}
-            >
-              {ANIM_LABELS[a]}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      {/* Pixel hearts row */}
-      <div className="flex justify-center gap-2 mt-6">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <motion.div
-            key={i}
-            animate={{ y: [0, -6, 0], scale: [1, 1.1, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
-            className="text-xl md:text-2xl"
-          >
-            🩷
-          </motion.div>
         ))}
       </div>
     </div>
