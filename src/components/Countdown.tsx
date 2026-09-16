@@ -13,26 +13,34 @@ function calcTime(targetDate: Date) {
   };
 }
 
-// Smooth slot-roll digit — slides new value in from top, old out to bottom
+// Clean odometer-style digit roll — old digit slides down & fades,
+// new digit slides in from top, both locked in a fixed clipped box
+// so they can never overlap or glitch.
 function Digit({ value }: { value: string }) {
   return (
     <span
       style={{
-        display: "inline-block",
         position: "relative",
-        width: "0.58em",
+        display: "inline-block",
+        width: "0.62em",
+        height: "1.15em",
         overflow: "hidden",
-        verticalAlign: "top",
       }}
     >
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence initial={false}>
         <motion.span
           key={value}
-          initial={{ y: "-110%", opacity: 0 }}
-          animate={{ y: "0%", opacity: 1 }}
-          exit={{ y: "110%", opacity: 0 }}
-          transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
-          style={{ display: "block" }}
+          initial={{ y: "-100%" }}
+          animate={{ y: "0%" }}
+          exit={{ y: "100%", opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.34, 1.1, 0.64, 1] }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           {value}
         </motion.span>
