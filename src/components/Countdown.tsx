@@ -25,6 +25,7 @@ function Digit({ value }: { value: string }) {
         width: "0.62em",
         height: "1.15em",
         overflow: "hidden",
+        lineHeight: "1.15em",
       }}
     >
       <AnimatePresence initial={false}>
@@ -36,10 +37,16 @@ function Digit({ value }: { value: string }) {
           transition={{ duration: 0.4, ease: [0.34, 1.1, 0.64, 1] }}
           style={{
             position: "absolute",
-            inset: 0,
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            fontFamily: "'Fredoka One', cursive",
+            fontWeight: 900,
+            lineHeight: 1,
           }}
         >
           {value}
@@ -70,8 +77,8 @@ function UnitCard({ value, label, emoji, floatDuration }: UnitCardProps) {
         boxShadow: "var(--glow-soft), 0 2px 0 rgba(255,255,255,0.9) inset",
       }}
     >
-      <div
-        className="text-5xl md:text-7xl font-black tabular-nums leading-none flex"
+            <div
+        className="text-5xl md:text-7xl font-black tabular-nums leading-none flex items-center"
         style={{
           fontFamily: "'Fredoka One', cursive",
           background: "linear-gradient(135deg, #ff3d8a 0%, #ff6eb4 50%, #ff9dd1 100%)",
